@@ -1,0 +1,20 @@
+---
+- name: Install and start NGINX on EC2
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Update package cache
+      yum:
+        update_cache: yes
+
+    - name: Install NGINX
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start NGINX service
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
