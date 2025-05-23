@@ -1,19 +1,20 @@
 variable "region" {
-  default = "eu-west-3"
-}
-
-variable "ami_id" {
-  default = "ami-029b6e21d09465678"
-}
-
-variable "instance_type" {
-  default = "t2.micro"
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-3"
 }
 
 variable "key_name" {
-  default = "hounkydoki"
+  description = "Nom du key-pair AWS à utiliser pour SSH"
+  type        = string
 }
 
 variable "your_ip_cidr" {
-  default = "213.221.128.52/32"
+  description = "Ton IP source en /32 pour SSH"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ARN du certificat SSL/TLS ACM"
+  type        = string
 }

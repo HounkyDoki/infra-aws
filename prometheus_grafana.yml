@@ -1,0 +1,44 @@
+---
+- name: Install Prometheus and Grafana
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install dependencies
+      yum:
+        name:
+          - wget
+          - tar
+          - grafana
+        state: present
+
+    - name: Download Prometheus
+      get_url:
+        url: https://github.com/prometheus/prometheus/releases/download/v2.48.1/prometheus-2.48.1.linux-amd64.tar.gz
+        dest: /tmp/prometheus.tar.gz
+
+    - name: Extract Prometheus
+      unarchive:
+        src: /tmp/prometheus.tar.gz
+        dest: /opt/
+        remote_src: yes
+
+    - name: Symlink Prometheus binaries
+      file:
+        src: "/opt/prometheus-2.48.1.linux-amd64/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        state: link
+      loop:
+        - prometheus
+        - promtool
+
+    - name: Start Prometheus
+      shell: nohup prometheus --config.file=/opt/prometheus-2.48.1.linux-amd64/prometheus.yml &
+      async: 10
+      poll: 0
+
+    - name: Start Grafana
+      systemd:
+        name: grafana-server
+        state: started
+        enabled: true

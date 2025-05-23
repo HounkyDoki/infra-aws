@@ -1,0 +1,28 @@
+---
+- name: Install and configure CloudWatch Agent
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Download CloudWatch Agent (Amazon Linux)
+      get_url:
+        url: https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+        dest: /tmp/amazon-cloudwatch-agent.rpm
+
+    - name: Install CloudWatch Agent
+      yum:
+        name: /tmp/amazon-cloudwatch-agent.rpm
+        state: present
+
+    - name: Copy CloudWatch Agent config
+      copy:
+        src: cloudwatch-config.json
+        dest: /opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+    - name: Start CloudWatch Agent
+      command: >
+        /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+        -a fetch-config
+        -m ec2
+        -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+        -s
